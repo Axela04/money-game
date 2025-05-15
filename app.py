@@ -6,42 +6,73 @@ import random
 import time
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import json
+from io import StringIO
 
 st.set_page_config(page_title="💸 Money Game for Kids", layout="centered")
 
-# Google Sheets setup
+# User selector
+st.sidebar.title("👤 Select User")
+username = st.sidebar.text_input("Enter your name")
+
+# Only proceed if username provided
+if not username:
+    st.warning("Please enter your name to start the game.")
+    st.stop()
+
+# Google Sheets setup using Streamlit secrets
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("google_credentials.json", scope)
+creds_json = StringIO(st.secrets["GOOGLE_CREDENTIALS"])
+creds = ServiceAccountCredentials.from_json_keyfile_name(creds_json, scope)
 client = gspread.authorize(creds)
 sheet = client.open("MoneyGameData").sheet1
 
-# Load from Google Sheets if available
-try:
-    values = sheet.get_all_records()
-    if values:
-        latest = values[-1]
-        st.session_state.balance = float(latest['balance'])
-        st.session_state.week = int(latest['week'])
-        st.session_state.taxes_paid = float(latest['taxes_paid'])
-        st.session_state.weekly_balances = eval(latest['weekly_balances'])
-        st.session_state.history = eval(latest['history'])
-except:
-    pass
+# Load from Google Sheets
+def load_user_data(username):
+    records = sheet.get_all_records()
+    for row in records:
+        if row['username'] == username:
+            st.session_state.balance = float(row['balance'])
+            st.session_state.week = int(row['week'])
+            st.session_state.taxes_paid = float(row['taxes_paid'])
+            st.session_state.weekly_balances = json.loads(row['weekly_balances'])
+            st.session_state.history = json.loads(row['history'])
+            return True
+    return False
 
-# At bottom, sync to sheet
-def save_to_google():
+# Save to Google Sheets
+def save_user_data():
     sheet.append_row([
+        username,
         st.session_state.week,
         st.session_state.balance,
         st.session_state.taxes_paid,
-        str(st.session_state.weekly_balances),
-        str(st.session_state.history)
+        json.dumps(st.session_state.weekly_balances),
+        json.dumps(st.session_state.history)
     ])
 
-# At end of file, insert:
+# Try loading user data
+if 'loaded' not in st.session_state:
+    if load_user_data(username):
+        st.success(f"Loaded saved data for {username}.")
+    else:
+        st.info(f"Welcome {username}! Starting fresh.")
+    st.session_state.loaded = True
+
+# Save/Load buttons
+st.sidebar.markdown("---")
+if st.sidebar.button("💾 Save Progress"):
+    save_user_data()
+    st.sidebar.success("Progress saved!")
+
+if st.sidebar.button("🔄 Load Progress"):
+    if load_user_data(username):
+        st.sidebar.success("Progress loaded!")
+    else:
+        st.sidebar.error("No saved data found.")
+
+# Footer
 st.markdown("---")
 st.markdown("### 🔗 Stay Connected")
 st.markdown("[🎥 Visit our YouTube Channel](https://www.youtube.com/@aimomlab)")
 st.markdown("[📝 Read our Blog on Blogger](https://aimomlab.blogspot.com)")
-
-save_to_google()
