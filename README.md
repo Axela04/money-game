@@ -1,33 +1,35 @@
-# 💸 AI-Powered Money Game for Kids
+# 💸 AI Mom Lab: Money Game for Kids
 
-A fun, educational game built with Streamlit to teach kids about money, taxes, saving, interest, chores, and smart spending. Designed to be interactive and faceless, this app helps young learners explore financial literacy in a playful way.
+A gamified financial learning app for kids, powered by Streamlit.
 
-## 🚀 Features
+## 🔑 Features
+- Weekly allowance system
+- Chore tracking with time limits
+- Tax payments and random IRS audits
+- Compound interest
+- Options trading simulation
+- Parent PIN controls
+- Persistent save/load with Google Sheets
+- Weekly balance tracking
 
-- Weekly allowance and interest
-- Taxed chore earnings with cooldowns
-- Daily time and chore limits
-- Weekly reading challenge
-- Gadget store rewards
-- 📈 Weekly savings chart
+## 🌐 Hosted on Streamlit + Synced with Google Sheets
 
-## 📦 Requirements
+## ▶️ To Run
+1. Clone the repo
+2. Add `google_credentials.json` to root
+3. Create a Google Sheet titled `MoneyGameData` with these columns:
+   ```
+   week | balance | taxes_paid | weekly_balances | history
+   ```
+4. Install requirements:
+   ```
+   pip install -r requirements.txt
+   ```
+5. Run app:
+   ```
+   streamlit run app.py
+   ```
 
-- Streamlit
-- streamlit-extras
-- matplotlib
-
-## ▶️ How to Run
-
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-## 📊 Screenshots
-
-(Insert screenshots after deployment)
-
-## 📚 License
-
-MIT License – use it, fork it, and make it better!
+## 📺 Follow Us
+- [YouTube Channel](https://www.youtube.com/@aimomlab)
+- [Blogger Site](https://aimomlab.blogspot.com)
